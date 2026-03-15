@@ -19,7 +19,7 @@ final class AuthServiceTest extends TestCase
         $httpClient->method('get')
             ->willReturn('{"token": "abc123token"}');
 
-        $client = new LastfmClient('test-key', $httpClient);
+        $client = new LastfmClient('test-key', httpClient: $httpClient);
         $token = $client->auth()->getToken();
 
         $this->assertSame('abc123token', $token);
@@ -42,15 +42,14 @@ final class AuthServiceTest extends TestCase
             }))
             ->willReturn('{"token": "abc123"}');
 
-        $client = new LastfmClient('test-key', $httpClient);
+        $client = new LastfmClient('test-key', httpClient: $httpClient);
         $client->auth()->getToken();
     }
 
     #[Test]
     public function itBuildsAuthUrl(): void
     {
-        $httpClient = $this->createStub(HttpClientInterface::class);
-        $client = new LastfmClient('my-api-key', $httpClient);
+        $client = new LastfmClient('my-api-key');
 
         $url = $client->auth()->getAuthUrl('mytoken');
 
@@ -70,8 +69,7 @@ final class AuthServiceTest extends TestCase
     #[Test]
     public function itBuildsAuthUrlWithCallback(): void
     {
-        $httpClient = $this->createStub(HttpClientInterface::class);
-        $client = new LastfmClient('my-api-key', $httpClient);
+        $client = new LastfmClient('my-api-key');
 
         $url = $client->auth()->getAuthUrl('mytoken', 'https://example.com/cb');
 
@@ -94,11 +92,7 @@ final class AuthServiceTest extends TestCase
                 ],
             ]));
 
-        $client = new LastfmClient(
-            apiKey: 'test-key',
-            httpClient: $httpClient,
-            apiSecret: 'test-secret',
-        );
+        $client = new LastfmClient('test-key', 'test-secret', httpClient: $httpClient);
 
         $session = $client->auth()->getSession('authorized-token');
 
@@ -133,11 +127,7 @@ final class AuthServiceTest extends TestCase
                 ],
             ]));
 
-        $client = new LastfmClient(
-            apiKey: 'test-key',
-            httpClient: $httpClient,
-            apiSecret: 'test-secret',
-        );
+        $client = new LastfmClient('test-key', 'test-secret', httpClient: $httpClient);
 
         $client->auth()->getSession('mytoken');
     }

@@ -86,19 +86,17 @@ class GuzzleHttpClient implements HttpClientInterface
 {
     public function get(string $url): string
     {
-        // Your Guzzle implementation
+        // Your Guzzle GET implementation
+    }
+
+    public function post(string $url, array $data): string
+    {
+        // Your Guzzle POST implementation
     }
 }
 
-$client = new LastfmClient('your-api-key', new GuzzleHttpClient());
+$client = new LastfmClient('your-api-key', httpClient: new GuzzleHttpClient());
 ```
-
-## Compatibility
-
-Tested against the following PHP versions:
-
-- PHP 8.4
-- PHP 8.5
 
 ## Development
 

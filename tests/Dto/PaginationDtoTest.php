@@ -11,12 +11,17 @@ use Rjds\PhpLastfmClient\Dto\PaginationDto;
 
 final class PaginationDtoTest extends TestCase
 {
+    private DtoMapper $mapper;
+
+    protected function setUp(): void
+    {
+        $this->mapper = new DtoMapper();
+    }
+
     #[Test]
     public function itMapsFromAttrData(): void
     {
-        $mapper = new DtoMapper();
-
-        $dto = $mapper->map([
+        $dto = $this->mapper->map([
             'page' => '3',
             'perPage' => '50',
             'total' => '1931',
