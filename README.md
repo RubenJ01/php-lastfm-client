@@ -38,6 +38,7 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 |-----------|----------------|------------------------------------------|------------------------------------------|
 | `user`    | `getInfo`      | Get information about a user profile     | [View](docs/user/getInfo.md)             |
 | `library` | `getArtists`   | Get all artists in a user's library      | [View](docs/library/getArtists.md)       |
+| `track`   | `scrobble`     | Scrobble a track to a user's profile     | [View](docs/track/scrobble.md)           |
 
 ## Error Handling
 
