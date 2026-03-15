@@ -8,6 +8,7 @@ use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\Http\LastfmHttpClient;
 use Rjds\PhpLastfmClient\Service\AuthService;
+use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
@@ -17,6 +18,7 @@ final class LastfmClient
     private const string BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
     private ?AuthService $authService = null;
+    private ?ChartService $chartService = null;
     private ?UserService $userService = null;
     private ?LibraryService $libraryService = null;
     private ?TrackService $trackService = null;
@@ -35,6 +37,14 @@ final class LastfmClient
     public function auth(): AuthService
     {
         return $this->authService ??= new AuthService($this);
+    }
+
+    /**
+     * Access chart-related API methods.
+     */
+    public function chart(): ChartService
+    {
+        return $this->chartService ??= new ChartService($this);
     }
 
     /**
