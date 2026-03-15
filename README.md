@@ -15,7 +15,18 @@ composer require rjds/php-lastfm-client
 ## Usage
 
 ```php
-// TODO: Add usage examples
+use Rjds\PhpLastfmClient\LastfmClient;
+
+$client = new LastfmClient('your-api-key');
+
+// Get user info
+$user = $client->user()->getInfo('rj');
+
+echo $user->name;        // "RJ"
+echo $user->playcount;   // 150316
+echo $user->country;     // "United Kingdom"
+echo $user->subscriber;  // true
+echo $user->registered->format('Y-m-d'); // "2002-11-20"
 ```
 
 ## Compatibility
