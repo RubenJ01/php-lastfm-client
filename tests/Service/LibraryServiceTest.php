@@ -6,8 +6,8 @@ namespace Rjds\PhpLastfmClient\Tests\Service;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Rjds\PhpLastfmClient\Dto\ImageDto;
-use Rjds\PhpLastfmClient\Dto\LibraryArtistDto;
+use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\Library\LibraryArtistDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
 

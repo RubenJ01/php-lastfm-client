@@ -6,8 +6,8 @@ namespace Rjds\PhpLastfmClient\Tests\Service;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Rjds\PhpLastfmClient\Dto\Scrobble;
-use Rjds\PhpLastfmClient\Dto\ScrobbleResponseDto;
+use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
+use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResponseDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
 

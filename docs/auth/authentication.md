@@ -59,6 +59,8 @@ echo "Session key: {$session->key}\n";
 Set the session key on the existing client, or create a new one:
 
 ```php
+use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
+
 // Option A: set session key on the same client
 $client->setSessionKey($session->key);
 

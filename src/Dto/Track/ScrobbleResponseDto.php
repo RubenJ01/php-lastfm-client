@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Dto;
+namespace Rjds\PhpLastfmClient\Dto\Track;
 
 final readonly class ScrobbleResponseDto
 {

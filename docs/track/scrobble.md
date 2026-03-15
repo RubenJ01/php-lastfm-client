@@ -25,7 +25,7 @@ The client automatically generates the required API signature for each authentic
 ### Single Scrobble
 
 ```php
-use Rjds\PhpLastfmClient\Dto\Scrobble;
+use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
 
 $result = $client->track()->scrobble(new Scrobble(
     artist: 'Radiohead',
