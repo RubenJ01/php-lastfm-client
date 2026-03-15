@@ -9,6 +9,7 @@ use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\Http\LastfmHttpClient;
 use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\ChartService;
+use Rjds\PhpLastfmClient\Service\GeoService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
@@ -19,6 +20,7 @@ final class LastfmClient
 
     private ?AuthService $authService = null;
     private ?ChartService $chartService = null;
+    private ?GeoService $geoService = null;
     private ?UserService $userService = null;
     private ?LibraryService $libraryService = null;
     private ?TrackService $trackService = null;
@@ -45,6 +47,14 @@ final class LastfmClient
     public function chart(): ChartService
     {
         return $this->chartService ??= new ChartService($this);
+    }
+
+    /**
+     * Access geo-related API methods.
+     */
+    public function geo(): GeoService
+    {
+        return $this->geoService ??= new GeoService($this);
     }
 
     /**
