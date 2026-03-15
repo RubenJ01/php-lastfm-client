@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\Track;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Rjds\PhpLastfmClient\Dto\ScrobbleResponseDto;
-use Rjds\PhpLastfmClient\Dto\ScrobbleResultDto;
+use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResponseDto;
+use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResultDto;
 
 final class ScrobbleResponseDtoTest extends TestCase
 {

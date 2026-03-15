@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Service;
 
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\UserDto;
+use Rjds\PhpLastfmClient\Dto\User\UserDto;
 use Rjds\PhpLastfmClient\LastfmClient;
 
 final readonly class UserService

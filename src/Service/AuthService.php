@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Service;
 
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\SessionDto;
+use Rjds\PhpLastfmClient\Dto\Auth\SessionDto;
 use Rjds\PhpLastfmClient\LastfmClient;
 
 final readonly class AuthService

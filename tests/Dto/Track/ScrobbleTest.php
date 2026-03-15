@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\Track;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Rjds\PhpLastfmClient\Dto\Scrobble;
+use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
 
 final class ScrobbleTest extends TestCase
 {

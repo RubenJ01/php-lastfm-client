@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\User;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\ImageDto;
-use Rjds\PhpLastfmClient\Dto\UserDto;
+use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\User\UserDto;
 
 final class UserDtoTest extends TestCase
 {

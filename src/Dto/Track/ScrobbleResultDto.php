@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Dto;
+namespace Rjds\PhpLastfmClient\Dto\Track;
 
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;

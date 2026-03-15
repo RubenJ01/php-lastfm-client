@@ -6,7 +6,7 @@ namespace Rjds\PhpLastfmClient\Tests\Service;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Rjds\PhpLastfmClient\Dto\UserDto;
+use Rjds\PhpLastfmClient\Dto\User\UserDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
 

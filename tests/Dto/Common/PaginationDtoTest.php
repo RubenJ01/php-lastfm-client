@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\Common;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\PaginationDto;
+use Rjds\PhpLastfmClient\Dto\Common\PaginationDto;
 
 final class PaginationDtoTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\Library;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\ImageDto;
-use Rjds\PhpLastfmClient\Dto\LibraryArtistDto;
+use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\Library\LibraryArtistDto;
 
 final class LibraryArtistDtoTest extends TestCase
 {

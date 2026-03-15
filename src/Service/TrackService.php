@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Service;
 
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\Scrobble;
-use Rjds\PhpLastfmClient\Dto\ScrobbleResponseDto;
-use Rjds\PhpLastfmClient\Dto\ScrobbleResultDto;
+use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
+use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResponseDto;
+use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResultDto;
 use Rjds\PhpLastfmClient\LastfmClient;
 
 final readonly class TrackService

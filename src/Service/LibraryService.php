@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Service;
 
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\LibraryArtistDto;
-use Rjds\PhpLastfmClient\Dto\PaginatedResponse;
-use Rjds\PhpLastfmClient\Dto\PaginationDto;
+use Rjds\PhpLastfmClient\Dto\Common\PaginatedResponse;
+use Rjds\PhpLastfmClient\Dto\Common\PaginationDto;
+use Rjds\PhpLastfmClient\Dto\Library\LibraryArtistDto;
 use Rjds\PhpLastfmClient\LastfmClient;
 
 final readonly class LibraryService

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Rjds\PhpLastfmClient\Tests\Dto;
+namespace Rjds\PhpLastfmClient\Tests\Dto\Auth;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpDto\DtoMapper;
-use Rjds\PhpLastfmClient\Dto\SessionDto;
+use Rjds\PhpLastfmClient\Dto\Auth\SessionDto;
 
 final class SessionDtoTest extends TestCase
 {
