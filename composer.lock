@@ -4,8 +4,67 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4aca3d228e458bbc9ab409d40e02a48b",
-    "packages": [],
+    "content-hash": "cd1442f0f27df55d2602768818e9e402",
+    "packages": [
+        {
+            "name": "rjds/php-dto",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RubenJ01/php-dto.git",
+                "reference": "5021412bb5eb7c408aaff1447b67e62a7e40dbfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RubenJ01/php-dto/zipball/5021412bb5eb7c408aaff1447b67e62a7e40dbfb",
+                "reference": "5021412bb5eb7c408aaff1447b67e62a7e40dbfb",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://ruben-jakob-digital-solutions.repo.repman.rubenjakob.com/dists/%package%/%version%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "infection/infection": "*",
+                "phpro/grumphp": "^2.19",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^13.0",
+                "squizlabs/php_codesniffer": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Rjds\\PhpDto\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Rjds\\PhpDto\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://ruben-jakob-digital-solutions.repo.repman.rubenjakob.com/downloads",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ruben Eekhof",
+                    "email": "rubeneekhof@gmail.com"
+                }
+            ],
+            "description": "A PHP library to map associative arrays to typed DTOs using attributes.",
+            "support": {
+                "source": "https://github.com/RubenJ01/php-dto/tree/v1.0.0",
+                "issues": "https://github.com/RubenJ01/php-dto/issues"
+            },
+            "time": "2026-03-15T12:27:22+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "amphp/amp",

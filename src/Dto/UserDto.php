@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Dto;
 
+use Rjds\PhpDto\Attribute\ArrayOf;
+use Rjds\PhpDto\Attribute\CastTo;
+use Rjds\PhpDto\Attribute\MapFrom;
+
 final readonly class UserDto
 {
     /**
@@ -14,54 +18,30 @@ final readonly class UserDto
         public string $realname,
         public string $url,
         public string $country,
+        #[CastTo('int')]
         public int $age,
+        #[CastTo('bool')]
         public bool $subscriber,
+        #[CastTo('int')]
         public int $playcount,
+        #[MapFrom('artist_count')]
+        #[CastTo('int')]
         public int $artistCount,
+        #[MapFrom('track_count')]
+        #[CastTo('int')]
         public int $trackCount,
+        #[MapFrom('album_count')]
+        #[CastTo('int')]
         public int $albumCount,
+        #[CastTo('int')]
         public int $playlists,
+        #[MapFrom('image')]
+        #[ArrayOf(ImageDto::class)]
         public array $images,
+        #[MapFrom('registered.unixtime')]
+        #[CastTo('datetime')]
         public \DateTimeImmutable $registered,
         public string $type,
     ) {
-    }
-
-    /**
-     * @param array{
-     *     name: string,
-     *     realname: string,
-     *     url: string,
-     *     country: string,
-     *     age: string,
-     *     subscriber: string,
-     *     playcount: string,
-     *     artist_count: string,
-     *     track_count: string,
-     *     album_count: string,
-     *     playlists: string,
-     *     image: list<array{size: string, '#text': string}>,
-     *     registered: array{unixtime: string, '#text': int},
-     *     type: string
-     * } $data
-     */
-    public static function fromArray(array $data): self
-    {
-        return new self(
-            name: $data['name'],
-            realname: $data['realname'],
-            url: $data['url'],
-            country: $data['country'],
-            age: (int) $data['age'],
-            subscriber: $data['subscriber'] === '1',
-            playcount: (int) $data['playcount'],
-            artistCount: (int) $data['artist_count'],
-            trackCount: (int) $data['track_count'],
-            albumCount: (int) $data['album_count'],
-            playlists: (int) $data['playlists'],
-            images: array_map(ImageDto::fromArray(...), $data['image']),
-            registered: (new \DateTimeImmutable())->setTimestamp((int) $data['registered']['unixtime']),
-            type: $data['type'],
-        );
     }
 }

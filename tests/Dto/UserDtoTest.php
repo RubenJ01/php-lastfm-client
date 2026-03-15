@@ -6,17 +6,23 @@ namespace Rjds\PhpLastfmClient\Tests\Dto;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Rjds\PhpDto\DtoMapper;
 use Rjds\PhpLastfmClient\Dto\ImageDto;
 use Rjds\PhpLastfmClient\Dto\UserDto;
 
 final class UserDtoTest extends TestCase
 {
-    #[Test]
-    public function itCreatesFromApiResponse(): void
-    {
-        $data = self::userApiResponse();
+    private DtoMapper $mapper;
 
-        $dto = UserDto::fromArray($data);
+    protected function setUp(): void
+    {
+        $this->mapper = new DtoMapper();
+    }
+
+    #[Test]
+    public function itMapsFromApiResponse(): void
+    {
+        $dto = $this->mapper->map(self::userApiResponse(), UserDto::class);
 
         $this->assertSame('RJ', $dto->name);
         $this->assertSame('Richard Jones', $dto->realname);
@@ -36,11 +42,10 @@ final class UserDtoTest extends TestCase
     #[Test]
     public function itParsesImages(): void
     {
-        $data = self::userApiResponse();
-
-        $dto = UserDto::fromArray($data);
+        $dto = $this->mapper->map(self::userApiResponse(), UserDto::class);
 
         $this->assertCount(2, $dto->images);
+        $this->assertInstanceOf(ImageDto::class, $dto->images[0]);
         $this->assertSame('small', $dto->images[0]->size);
         $this->assertSame('https://lastfm.freetls.fastly.net/i/u/34s/image.png', $dto->images[0]->url);
         $this->assertSame('large', $dto->images[1]->size);
@@ -53,28 +58,13 @@ final class UserDtoTest extends TestCase
         $data = self::userApiResponse();
         $data['subscriber'] = '0';
 
-        $dto = UserDto::fromArray($data);
+        $dto = $this->mapper->map($data, UserDto::class);
 
         $this->assertFalse($dto->subscriber);
     }
 
     /**
-     * @return array{
-     *     name: string,
-     *     realname: string,
-     *     url: string,
-     *     country: string,
-     *     age: string,
-     *     subscriber: string,
-     *     playcount: string,
-     *     artist_count: string,
-     *     track_count: string,
-     *     album_count: string,
-     *     playlists: string,
-     *     image: list<array{size: string, '#text': string}>,
-     *     registered: array{unixtime: string, '#text': int},
-     *     type: string
-     * }
+     * @return array<string, mixed>
      */
     private static function userApiResponse(): array
     {
