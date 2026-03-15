@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
+use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\UserService;
 
 final class LastfmClientTest extends TestCase
@@ -19,6 +20,14 @@ final class LastfmClientTest extends TestCase
         $client = new LastfmClient('test-api-key');
 
         $this->assertInstanceOf(UserService::class, $client->user());
+    }
+
+    #[Test]
+    public function itReturnsLibraryService(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertInstanceOf(LibraryService::class, $client->library());
     }
 
     #[Test]
