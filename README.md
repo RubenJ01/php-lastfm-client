@@ -44,6 +44,8 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 | `chart`   | `getTopArtists`  | Get the top artists chart                | [View](docs/chart/getTopArtists.md)      |
 | `chart`   | `getTopTags`     | Get the top tags chart                   | [View](docs/chart/getTopTags.md)         |
 | `chart`   | `getTopTracks`   | Get the top tracks chart                 | [View](docs/chart/getTopTracks.md)       |
+| `geo`     | `getTopArtists`  | Get the top artists by country           | [View](docs/geo/getTopArtists.md)        |
+| `geo`     | `getTopTracks`   | Get the top tracks by country            | [View](docs/geo/getTopTracks.md)         |
 | `user`    | `getInfo`        | Get information about a user profile     | [View](docs/user/getInfo.md)             |
 | `user`    | `getLovedTracks` | Get a user's loved tracks                | [View](docs/user/getLovedTracks.md)      |
 | `library` | `getArtists`     | Get all artists in a user's library      | [View](docs/library/getArtists.md)       |
