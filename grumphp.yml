@@ -1,0 +1,12 @@
+grumphp:
+    tasks:
+        phpcs:
+            standard: ["PSR12"]
+            whitelist_patterns:
+                - /^src\/(.*)/
+                - /^tests\/(.*)/
+        phpstan:
+            configuration: phpstan.neon
+            ignore_patterns:
+                - "configure.php"
+        phpunit: ~
