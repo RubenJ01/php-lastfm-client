@@ -10,6 +10,7 @@ use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
 use Rjds\PhpLastfmClient\Service\AuthService;
+use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
@@ -32,6 +33,22 @@ final class LastfmClientTest extends TestCase
         $client = new LastfmClient('test-api-key');
 
         $this->assertSame($client->auth(), $client->auth());
+    }
+
+    #[Test]
+    public function itReturnsChartService(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertInstanceOf(ChartService::class, $client->chart());
+    }
+
+    #[Test]
+    public function itReturnsSameChartServiceInstance(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertSame($client->chart(), $client->chart());
     }
 
     #[Test]
