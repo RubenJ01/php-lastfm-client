@@ -4,20 +4,12 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Service;
 
-use Rjds\PhpDto\DtoMapper;
 use Rjds\PhpLastfmClient\Dto\Track\Scrobble;
 use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResponseDto;
 use Rjds\PhpLastfmClient\Dto\Track\ScrobbleResultDto;
-use Rjds\PhpLastfmClient\LastfmClient;
 
-final readonly class TrackService
+final readonly class TrackService extends AbstractService
 {
-    public function __construct(
-        private LastfmClient $client,
-        private DtoMapper $mapper = new DtoMapper(),
-    ) {
-    }
-
     /**
      * Scrobble a single track.
      *

@@ -4,19 +4,11 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Service;
 
-use Rjds\PhpDto\DtoMapper;
 use Rjds\PhpLastfmClient\Dto\Auth\SessionDto;
-use Rjds\PhpLastfmClient\LastfmClient;
 
-final readonly class AuthService
+final readonly class AuthService extends AbstractService
 {
     private const string AUTH_URL = 'https://www.last.fm/api/auth/';
-
-    public function __construct(
-        private LastfmClient $client,
-        private DtoMapper $mapper = new DtoMapper(),
-    ) {
-    }
 
     /**
      * Get an unauthorized request token.
