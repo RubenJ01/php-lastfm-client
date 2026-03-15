@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
+use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
@@ -273,5 +274,102 @@ final class LastfmClientTest extends TestCase
         $this->expectExceptionMessage('Failed to decode Last.fm API response');
 
         $client->callAuthenticated('track.scrobble');
+    }
+
+    #[Test]
+    public function itReturnsAuthService(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertInstanceOf(AuthService::class, $client->auth());
+    }
+
+    #[Test]
+    public function itExposesApiKey(): void
+    {
+        $client = new LastfmClient('my-special-key');
+
+        $this->assertSame('my-special-key', $client->getApiKey());
+    }
+
+    #[Test]
+    public function itCallsSignedWithSignatureButNoSessionKey(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $host = parse_url($url, PHP_URL_HOST);
+                $this->assertSame('ws.audioscrobbler.com', $host);
+
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string) $query, $params);
+                $this->assertSame('auth.getsession', $params['method']);
+                $this->assertSame('test-key', $params['api_key']);
+                $this->assertArrayHasKey('api_sig', $params);
+                $this->assertSame('json', $params['format']);
+                $this->assertArrayNotHasKey('sk', $params);
+
+                return true;
+            }))
+            ->willReturn('{"session": {}}');
+
+        $client = new LastfmClient(
+            apiKey: 'test-key',
+            httpClient: $httpClient,
+            apiSecret: 'test-secret',
+        );
+
+        $client->callSigned('auth.getsession', ['token' => 'tok']);
+    }
+
+    #[Test]
+    public function itGeneratesCorrectSignatureForSignedCalls(): void
+    {
+        $capturedUrl = '';
+
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(
+                function (string $url) use (&$capturedUrl): bool {
+                    $capturedUrl = $url;
+                    return true;
+                },
+            ))
+            ->willReturn('{"result": {}}');
+
+        $client = new LastfmClient(
+            apiKey: 'testkey',
+            httpClient: $httpClient,
+            apiSecret: 'testsecret',
+        );
+
+        $client->callSigned('auth.getsession', ['token' => 'tok123']);
+
+        $query = parse_url($capturedUrl, PHP_URL_QUERY);
+        $this->assertIsString($query);
+        parse_str((string) $query, $params);
+
+        $expected = md5(
+            'api_keytestkey'
+            . 'methodauth.getsession'
+            . 'tokentok123'
+            . 'testsecret'
+        );
+
+        $this->assertSame($expected, $params['api_sig']);
+    }
+
+    #[Test]
+    public function itThrowsWhenApiSecretMissingForSignedCalls(): void
+    {
+        $client = new LastfmClient('test-key');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('API secret is required');
+
+        $client->callSigned('auth.getsession');
     }
 }

@@ -7,6 +7,7 @@ namespace Rjds\PhpLastfmClient;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\Http\LastfmHttpClient;
+use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
@@ -21,6 +22,14 @@ final class LastfmClient
         private readonly ?string $apiSecret = null,
         private readonly ?string $sessionKey = null,
     ) {
+    }
+
+    /**
+     * Access authentication-related API methods.
+     */
+    public function auth(): AuthService
+    {
+        return new AuthService($this);
     }
 
     /**
@@ -109,6 +118,50 @@ final class LastfmClient
         $body = $this->httpClient->post(self::BASE_URL, $params);
 
         return $this->decodeResponse($body);
+    }
+
+    /**
+     * Make a signed GET API call to the Last.fm API.
+     *
+     * Used for methods that require a signature but not a session key
+     * (e.g. auth.getSession).
+     *
+     * @param string $method The API method (e.g. 'auth.getSession')
+     * @param array<string, string> $params Additional parameters
+     * @return array<string, mixed> The decoded JSON response
+     *
+     * @throws \RuntimeException when API secret is not configured
+     * @throws LastfmApiException when the API returns an error
+     */
+    public function callSigned(string $method, array $params = []): array
+    {
+        if ($this->apiSecret === null) {
+            throw new \RuntimeException(
+                'API secret is required for signed calls.'
+            );
+        }
+
+        $params = array_merge($params, [
+            'method' => $method,
+            'api_key' => $this->apiKey,
+        ]);
+
+        $params['api_sig'] = $this->generateSignature($params);
+        $params['format'] = 'json';
+
+        $url = self::BASE_URL . '?' . http_build_query($params);
+
+        $body = $this->httpClient->get($url);
+
+        return $this->decodeResponse($body);
+    }
+
+    /**
+     * Get the API key.
+     */
+    public function getApiKey(): string
+    {
+        return $this->apiKey;
     }
 
     /**

@@ -39,6 +39,25 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 | `user`    | `getInfo`      | Get information about a user profile     | [View](docs/user/getInfo.md)             |
 | `library` | `getArtists`   | Get all artists in a user's library      | [View](docs/library/getArtists.md)       |
 | `track`   | `scrobble`     | Scrobble a track to a user's profile     | [View](docs/track/scrobble.md)           |
+| `auth`    | `getToken`     | Get a request token for authentication   | [View](docs/auth/authentication.md)      |
+| `auth`    | `getSession`   | Exchange an authorized token for session | [View](docs/auth/authentication.md)      |
+
+## Authentication
+
+For write methods (scrobbling, etc.), you need to authenticate. See the [authentication guide](docs/auth/authentication.md) for the full flow:
+
+```php
+$client = new LastfmClient(
+    apiKey: 'your-api-key',
+    apiSecret: 'your-api-secret',
+);
+
+$token = $client->auth()->getToken();
+$authUrl = $client->auth()->getAuthUrl($token);
+// User visits $authUrl and grants access...
+$session = $client->auth()->getSession($token);
+// Use $session->key for authenticated calls
+```
 
 ## Error Handling
 
