@@ -29,8 +29,8 @@ final readonly class LibraryService
     {
         $response = $this->client->call('library.getartists', [
             'user' => $user,
-            'limit' => (string) $limit,
-            'page' => (string) $page,
+            'limit' => $limit,
+            'page' => $page,
         ]);
 
         /** @var array<string, mixed> $data */

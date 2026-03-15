@@ -83,7 +83,7 @@ final class LastfmClient
      * Make a GET API call to the Last.fm API.
      *
      * @param string $method The API method (e.g. 'user.getinfo')
-     * @param array<string, string> $params Additional query parameters
+     * @param array<string, string|int> $params Additional query parameters
      * @return array<string, mixed> The decoded JSON response
      *
      * @throws LastfmApiException when the API returns an error
@@ -105,7 +105,7 @@ final class LastfmClient
      * (e.g. auth.getSession).
      *
      * @param string $method The API method (e.g. 'auth.getSession')
-     * @param array<string, string> $params Additional parameters
+     * @param array<string, string|int> $params Additional parameters
      * @return array<string, mixed> The decoded JSON response
      *
      * @throws \RuntimeException when API secret is not configured
@@ -127,7 +127,7 @@ final class LastfmClient
      * Generates the required API signature and includes the session key.
      *
      * @param string $method The API method (e.g. 'track.scrobble')
-     * @param array<string, string> $params Additional parameters
+     * @param array<string, string|int> $params Additional parameters
      * @return array<string, mixed> The decoded JSON response
      *
      * @throws \RuntimeException when API secret or session key is not configured
@@ -157,8 +157,8 @@ final class LastfmClient
     /**
      * Merge base API parameters (method, api_key) into the given params.
      *
-     * @param array<string, string> $params
-     * @return array<string, string>
+     * @param array<string, string|int> $params
+     * @return array<string, string|int>
      */
     private function withBaseParams(string $method, array $params): array
     {
@@ -171,8 +171,8 @@ final class LastfmClient
     /**
      * Sign the parameters and add 'api_sig' and 'format'.
      *
-     * @param array<string, string> $params Parameters to sign (must not include 'format')
-     * @return array<string, string>
+     * @param array<string, string|int> $params Parameters to sign (must not include 'format')
+     * @return array<string, string|int>
      *
      * @throws \RuntimeException when API secret is not configured
      */

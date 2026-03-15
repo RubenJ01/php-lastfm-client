@@ -12,7 +12,7 @@ final class LastfmHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param array<string, string> $data
+     * @param array<string, string|int> $data
      */
     public function post(string $url, array $data): string
     {
