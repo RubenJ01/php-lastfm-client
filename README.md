@@ -1,5 +1,10 @@
 # PHP Last.fm Client
 
+![Version](https://img.shields.io/github/v/release/RubenJ01/php-lastfm-client?label=version)
+[![codecov](https://codecov.io/github/RubenJ01/php-lastfm-client/graph/badge.svg)](https://codecov.io/github/RubenJ01/php-lastfm-client)
+[![status-badge](https://ci.rubenjakob.com/api/badges/RubenJ01/php-lastfm-client/status.svg)](https://ci.rubenjakob.com/repos/RubenJ01/php-lastfm-client)
+![License](https://img.shields.io/github/license/RubenJ01/php-lastfm-client)
+
 A PHP client library for the [Last.fm API](https://www.last.fm/api).
 
 ## Requirements
