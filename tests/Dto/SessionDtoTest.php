@@ -11,12 +11,17 @@ use Rjds\PhpLastfmClient\Dto\SessionDto;
 
 final class SessionDtoTest extends TestCase
 {
+    private DtoMapper $mapper;
+
+    protected function setUp(): void
+    {
+        $this->mapper = new DtoMapper();
+    }
+
     #[Test]
     public function itMapsFromApiResponse(): void
     {
-        $mapper = new DtoMapper();
-
-        $dto = $mapper->map([
+        $dto = $this->mapper->map([
             'name' => 'RubenJ01',
             'key' => 'abc123sessionkey',
             'subscriber' => '0',
@@ -30,9 +35,7 @@ final class SessionDtoTest extends TestCase
     #[Test]
     public function itMapsSubscriberTrue(): void
     {
-        $mapper = new DtoMapper();
-
-        $dto = $mapper->map([
+        $dto = $this->mapper->map([
             'name' => 'RubenJ01',
             'key' => 'abc123',
             'subscriber' => '1',

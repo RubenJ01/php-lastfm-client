@@ -11,12 +11,17 @@ use Rjds\PhpLastfmClient\Dto\ImageDto;
 
 final class ImageDtoTest extends TestCase
 {
+    private DtoMapper $mapper;
+
+    protected function setUp(): void
+    {
+        $this->mapper = new DtoMapper();
+    }
+
     #[Test]
     public function itMapsFromApiData(): void
     {
-        $mapper = new DtoMapper();
-
-        $dto = $mapper->map([
+        $dto = $this->mapper->map([
             'size' => 'large',
             '#text' => 'https://lastfm.freetls.fastly.net/i/u/174s/image.png',
         ], ImageDto::class);

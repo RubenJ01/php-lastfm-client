@@ -56,17 +56,17 @@ echo "Session key: {$session->key}\n";
 
 ### Step 4: Use the Session Key
 
-Create a new client with the session key to make authenticated calls:
+Set the session key on the existing client, or create a new one:
 
 ```php
-$authenticatedClient = new LastfmClient(
-    apiKey: 'your-api-key',
-    apiSecret: 'your-api-secret',
-    sessionKey: $session->key,
-);
+// Option A: set session key on the same client
+$client->setSessionKey($session->key);
+
+// Option B: create a new client with all credentials
+$client = new LastfmClient('your-api-key', 'your-api-secret', $session->key);
 
 // Now you can scrobble, love tracks, etc.
-$authenticatedClient->track()->scrobble(new Scrobble(
+$client->track()->scrobble(new Scrobble(
     artist: 'Radiohead',
     track: 'Karma Police',
     timestamp: time(),
@@ -105,10 +105,6 @@ echo "Visit: {$authUrl}\n";
 $session = $client->auth()->getSession($token);
 echo "Session key: {$session->key}\n";
 
-// 5. Store the session key and use it for authenticated calls
-$authenticated = new LastfmClient(
-    apiKey: 'your-api-key',
-    apiSecret: 'your-api-secret',
-    sessionKey: $session->key,
-);
+// 5. Set the session key and make authenticated calls
+$client->setSessionKey($session->key);
 ```

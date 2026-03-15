@@ -17,28 +17,9 @@ final class UserServiceTest extends TestCase
     {
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient->method('get')
-            ->willReturn((string) json_encode([
-                'user' => [
-                    'name' => 'RJ',
-                    'realname' => 'Richard Jones',
-                    'url' => 'https://www.last.fm/user/RJ',
-                    'country' => 'United Kingdom',
-                    'age' => '0',
-                    'subscriber' => '1',
-                    'playcount' => '150316',
-                    'artist_count' => '12749',
-                    'track_count' => '57066',
-                    'album_count' => '26658',
-                    'playlists' => '0',
-                    'image' => [
-                        ['size' => 'small', '#text' => 'https://lastfm.freetls.fastly.net/i/u/34s/image.png'],
-                    ],
-                    'registered' => ['unixtime' => '1037793040', '#text' => 1037793040],
-                    'type' => 'alum',
-                ],
-            ]));
+            ->willReturn((string) json_encode(self::userGetInfoResponse()));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $user = $client->user()->getInfo('rj');
 
         $this->assertInstanceOf(UserDto::class, $user);
@@ -62,26 +43,36 @@ final class UserServiceTest extends TestCase
 
                 return true;
             }))
-            ->willReturn((string) json_encode([
-                'user' => [
-                    'name' => 'testuser',
-                    'realname' => 'Test User',
-                    'url' => 'https://www.last.fm/user/testuser',
-                    'country' => '',
-                    'age' => '0',
-                    'subscriber' => '0',
-                    'playcount' => '0',
-                    'artist_count' => '0',
-                    'track_count' => '0',
-                    'album_count' => '0',
-                    'playlists' => '0',
-                    'image' => [],
-                    'registered' => ['unixtime' => '0', '#text' => 0],
-                    'type' => 'user',
-                ],
-            ]));
+            ->willReturn((string) json_encode(self::userGetInfoResponse('testuser')));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $client->user()->getInfo('testuser');
+    }
+
+    /**
+     * @return array{user: array<string, mixed>}
+     */
+    private static function userGetInfoResponse(string $name = 'RJ'): array
+    {
+        return [
+            'user' => [
+                'name' => $name,
+                'realname' => 'Richard Jones',
+                'url' => "https://www.last.fm/user/{$name}",
+                'country' => 'United Kingdom',
+                'age' => '0',
+                'subscriber' => '1',
+                'playcount' => '150316',
+                'artist_count' => '12749',
+                'track_count' => '57066',
+                'album_count' => '26658',
+                'playlists' => '0',
+                'image' => [
+                    ['size' => 'small', '#text' => 'https://lastfm.freetls.fastly.net/i/u/34s/image.png'],
+                ],
+                'registered' => ['unixtime' => '1037793040', '#text' => 1037793040],
+                'type' => 'alum',
+            ],
+        ];
     }
 }

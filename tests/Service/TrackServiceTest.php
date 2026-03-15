@@ -16,12 +16,7 @@ final class TrackServiceTest extends TestCase
     private function createAuthenticatedClient(
         HttpClientInterface $httpClient,
     ): LastfmClient {
-        return new LastfmClient(
-            apiKey: 'test-key',
-            httpClient: $httpClient,
-            apiSecret: 'test-secret',
-            sessionKey: 'test-sk',
-        );
+        return new LastfmClient('test-key', 'test-secret', 'test-sk', $httpClient);
     }
 
     #[Test]

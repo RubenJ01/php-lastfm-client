@@ -16,11 +16,16 @@ final class LastfmClient
 {
     private const string BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
+    private ?AuthService $authService = null;
+    private ?UserService $userService = null;
+    private ?LibraryService $libraryService = null;
+    private ?TrackService $trackService = null;
+
     public function __construct(
         private readonly string $apiKey,
-        private readonly HttpClientInterface $httpClient = new LastfmHttpClient(),
         private readonly ?string $apiSecret = null,
-        private readonly ?string $sessionKey = null,
+        private ?string $sessionKey = null,
+        private readonly HttpClientInterface $httpClient = new LastfmHttpClient(),
     ) {
     }
 
@@ -29,7 +34,7 @@ final class LastfmClient
      */
     public function auth(): AuthService
     {
-        return new AuthService($this);
+        return $this->authService ??= new AuthService($this);
     }
 
     /**
@@ -37,7 +42,7 @@ final class LastfmClient
      */
     public function user(): UserService
     {
-        return new UserService($this);
+        return $this->userService ??= new UserService($this);
     }
 
     /**
@@ -45,7 +50,7 @@ final class LastfmClient
      */
     public function library(): LibraryService
     {
-        return new LibraryService($this);
+        return $this->libraryService ??= new LibraryService($this);
     }
 
     /**
@@ -53,11 +58,29 @@ final class LastfmClient
      */
     public function track(): TrackService
     {
-        return new TrackService($this);
+        return $this->trackService ??= new TrackService($this);
     }
 
     /**
-     * Make a raw GET API call to the Last.fm API.
+     * Set the session key for authenticated calls.
+     *
+     * Useful after completing the authentication flow via auth()->getSession().
+     */
+    public function setSessionKey(string $sessionKey): void
+    {
+        $this->sessionKey = $sessionKey;
+    }
+
+    /**
+     * Get the API key.
+     */
+    public function getApiKey(): string
+    {
+        return $this->apiKey;
+    }
+
+    /**
+     * Make a GET API call to the Last.fm API.
      *
      * @param string $method The API method (e.g. 'user.getinfo')
      * @param array<string, string> $params Additional query parameters
@@ -67,17 +90,35 @@ final class LastfmClient
      */
     public function call(string $method, array $params = []): array
     {
-        $queryParams = array_merge($params, [
-            'method' => $method,
-            'api_key' => $this->apiKey,
-            'format' => 'json',
-        ]);
+        $params = $this->withBaseParams($method, $params);
+        $params['format'] = 'json';
 
-        $url = self::BASE_URL . '?' . http_build_query($queryParams);
+        $url = self::BASE_URL . '?' . http_build_query($params);
 
-        $body = $this->httpClient->get($url);
+        return $this->decodeResponse($this->httpClient->get($url));
+    }
 
-        return $this->decodeResponse($body);
+    /**
+     * Make a signed GET API call to the Last.fm API.
+     *
+     * Used for methods that require a signature but not a session key
+     * (e.g. auth.getSession).
+     *
+     * @param string $method The API method (e.g. 'auth.getSession')
+     * @param array<string, string> $params Additional parameters
+     * @return array<string, mixed> The decoded JSON response
+     *
+     * @throws \RuntimeException when API secret is not configured
+     * @throws LastfmApiException when the API returns an error
+     */
+    public function callSigned(string $method, array $params = []): array
+    {
+        $params = $this->withBaseParams($method, $params);
+        $params = $this->signParams($params);
+
+        $url = self::BASE_URL . '?' . http_build_query($params);
+
+        return $this->decodeResponse($this->httpClient->get($url));
     }
 
     /**
@@ -102,77 +143,47 @@ final class LastfmClient
 
         if ($this->sessionKey === null) {
             throw new \RuntimeException(
-                'Session key is required for authenticated calls.'
+                'Session key is required for authenticated calls. Use setSessionKey() or pass it in the constructor.'
             );
         }
 
-        $params = array_merge($params, [
-            'method' => $method,
-            'api_key' => $this->apiKey,
-            'sk' => $this->sessionKey,
-        ]);
+        $params = $this->withBaseParams($method, $params);
+        $params['sk'] = $this->sessionKey;
+        $params = $this->signParams($params);
 
-        $params['api_sig'] = $this->generateSignature($params);
-        $params['format'] = 'json';
-
-        $body = $this->httpClient->post(self::BASE_URL, $params);
-
-        return $this->decodeResponse($body);
+        return $this->decodeResponse($this->httpClient->post(self::BASE_URL, $params));
     }
 
     /**
-     * Make a signed GET API call to the Last.fm API.
+     * Merge base API parameters (method, api_key) into the given params.
      *
-     * Used for methods that require a signature but not a session key
-     * (e.g. auth.getSession).
+     * @param array<string, string> $params
+     * @return array<string, string>
+     */
+    private function withBaseParams(string $method, array $params): array
+    {
+        return array_merge($params, [
+            'method' => $method,
+            'api_key' => $this->apiKey,
+        ]);
+    }
+
+    /**
+     * Sign the parameters and add 'api_sig' and 'format'.
      *
-     * @param string $method The API method (e.g. 'auth.getSession')
-     * @param array<string, string> $params Additional parameters
-     * @return array<string, mixed> The decoded JSON response
+     * @param array<string, string> $params Parameters to sign (must not include 'format')
+     * @return array<string, string>
      *
      * @throws \RuntimeException when API secret is not configured
-     * @throws LastfmApiException when the API returns an error
      */
-    public function callSigned(string $method, array $params = []): array
+    private function signParams(array $params): array
     {
         if ($this->apiSecret === null) {
             throw new \RuntimeException(
-                'API secret is required for signed calls.'
+                'API secret is required for signed/authenticated calls.'
             );
         }
 
-        $params = array_merge($params, [
-            'method' => $method,
-            'api_key' => $this->apiKey,
-        ]);
-
-        $params['api_sig'] = $this->generateSignature($params);
-        $params['format'] = 'json';
-
-        $url = self::BASE_URL . '?' . http_build_query($params);
-
-        $body = $this->httpClient->get($url);
-
-        return $this->decodeResponse($body);
-    }
-
-    /**
-     * Get the API key.
-     */
-    public function getApiKey(): string
-    {
-        return $this->apiKey;
-    }
-
-    /**
-     * Generate an API method signature.
-     *
-     * @param array<string, string> $params Parameters to sign (excluding 'format')
-     *
-     * @see https://www.last.fm/api/authspec#_8-signing-calls
-     */
-    private function generateSignature(array $params): string
-    {
         ksort($params);
 
         $signature = '';
@@ -180,9 +191,10 @@ final class LastfmClient
             $signature .= $key . $value;
         }
 
-        $signature .= $this->apiSecret;
+        $params['api_sig'] = md5($signature . $this->apiSecret);
+        $params['format'] = 'json';
 
-        return md5($signature);
+        return $params;
     }
 
     /**

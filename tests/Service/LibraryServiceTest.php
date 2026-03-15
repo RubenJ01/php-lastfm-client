@@ -20,7 +20,7 @@ final class LibraryServiceTest extends TestCase
         $httpClient->method('get')
             ->willReturn((string) json_encode(self::libraryGetArtistsResponse()));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $result = $client->library()->getArtists('rj');
 
         $this->assertCount(2, $result->items);
@@ -38,7 +38,7 @@ final class LibraryServiceTest extends TestCase
         $httpClient->method('get')
             ->willReturn((string) json_encode(self::libraryGetArtistsResponse()));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $result = $client->library()->getArtists('rj');
 
         $this->assertSame(1, $result->pagination->page);
@@ -65,7 +65,7 @@ final class LibraryServiceTest extends TestCase
             }))
             ->willReturn((string) json_encode(self::libraryGetArtistsResponse()));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $client->library()->getArtists('testuser', 10, 3);
     }
 
@@ -88,7 +88,7 @@ final class LibraryServiceTest extends TestCase
                 (string) json_encode(self::libraryGetArtistsResponse())
             );
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $client->library()->getArtists('rj');
     }
 
@@ -99,7 +99,7 @@ final class LibraryServiceTest extends TestCase
         $httpClient->method('get')
             ->willReturn((string) json_encode(self::libraryGetArtistsResponse()));
 
-        $client = new LastfmClient('test-api-key', $httpClient);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $result = $client->library()->getArtists('rj');
 
         $this->assertCount(2, $result->items[0]->images);
