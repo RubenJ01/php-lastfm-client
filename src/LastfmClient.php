@@ -7,6 +7,7 @@ namespace Rjds\PhpLastfmClient;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\Http\LastfmHttpClient;
+use Rjds\PhpLastfmClient\Service\LibraryService;
 use Rjds\PhpLastfmClient\Service\UserService;
 
 final class LastfmClient
@@ -25,6 +26,14 @@ final class LastfmClient
     public function user(): UserService
     {
         return new UserService($this);
+    }
+
+    /**
+     * Access library-related API methods.
+     */
+    public function library(): LibraryService
+    {
+        return new LibraryService($this);
     }
 
     /**
