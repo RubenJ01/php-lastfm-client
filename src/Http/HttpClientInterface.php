@@ -16,7 +16,7 @@ interface HttpClientInterface
     /**
      * Perform a POST request with form data and return the response body.
      *
-     * @param array<string, string> $data Form data to send
+     * @param array<string, string|int> $data Form data to send
      *
      * @throws \RuntimeException on network or connection errors
      */
