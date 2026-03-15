@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Service;
 
+use Rjds\PhpDto\DtoMapper;
 use Rjds\PhpLastfmClient\Dto\UserDto;
 use Rjds\PhpLastfmClient\LastfmClient;
 
@@ -11,6 +12,7 @@ final readonly class UserService
 {
     public function __construct(
         private LastfmClient $client,
+        private DtoMapper $mapper = new DtoMapper(),
     ) {
     }
 
@@ -23,9 +25,9 @@ final readonly class UserService
     {
         $response = $this->client->call('user.getinfo', ['user' => $user]);
 
-        /** @var array{name: string, realname: string, url: string, country: string, age: string, subscriber: string, playcount: string, artist_count: string, track_count: string, album_count: string, playlists: string, image: list<array{size: string, '#text': string}>, registered: array{unixtime: string, '#text': int}, type: string} $userData */
+        /** @var array<string, mixed> $userData */
         $userData = $response['user'];
 
-        return UserDto::fromArray($userData);
+        return $this->mapper->map($userData, UserDto::class);
     }
 }
