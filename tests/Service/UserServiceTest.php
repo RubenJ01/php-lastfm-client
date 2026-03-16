@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
 use Rjds\PhpLastfmClient\Dto\User\FriendDto;
 use Rjds\PhpLastfmClient\Dto\User\LovedTrackDto;
+use Rjds\PhpLastfmClient\Dto\User\PersonalTagAlbumDto;
+use Rjds\PhpLastfmClient\Dto\User\PersonalTagArtistDto;
+use Rjds\PhpLastfmClient\Dto\User\PersonalTagTrackDto;
 use Rjds\PhpLastfmClient\Dto\User\UserDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
@@ -378,6 +381,261 @@ final class UserServiceTest extends TestCase
                 'fulltrack' => '0',
                 '#text' => '0',
             ],
+        ];
+    }
+
+    #[Test]
+    public function itReturnsPersonalTagArtists(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string)json_encode(self::personalTagsResponse('artist'))
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getPersonalTags('rj', 'rock', 'artist');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(PersonalTagArtistDto::class, $result->items[0]);
+        $this->assertSame('Jack Bruce', $result->items[0]->name);
+        $this->assertSame('Afghan Whigs', $result->items[1]->name);
+    }
+
+    #[Test]
+    public function itReturnsPersonalTagTracks(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string)json_encode(self::personalTagsResponse('track'))
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getPersonalTags('rj', 'rock', 'track');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(PersonalTagTrackDto::class, $result->items[0]);
+        $this->assertSame('Arc Of A Diver', $result->items[0]->name);
+        $this->assertSame('Steve Winwood', $result->items[0]->artistName);
+    }
+
+    #[Test]
+    public function itReturnsPersonalTagAlbums(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string)json_encode(self::personalTagsResponse('album'))
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getPersonalTags('rj', 'rock', 'album');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(PersonalTagAlbumDto::class, $result->items[0]);
+        $this->assertSame('OK Computer', $result->items[0]->name);
+        $this->assertSame('Radiohead', $result->items[0]->artistName);
+    }
+
+    #[Test]
+    public function itReturnsPaginationForPersonalTags(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string)json_encode(self::personalTagsResponse('artist'))
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getPersonalTags('rj', 'rock', 'artist');
+
+        $this->assertSame(1, $result->pagination->page);
+        $this->assertSame(2, $result->pagination->perPage);
+        $this->assertSame(20, $result->pagination->total);
+        $this->assertSame(10, $result->pagination->totalPages);
+    }
+
+    #[Test]
+    public function itCallsGetPersonalTagsWithCorrectParams(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string)$query, $params);
+                $this->assertSame('user.getpersonaltags', $params['method']);
+                $this->assertSame('testuser', $params['user']);
+                $this->assertSame('rock', $params['tag']);
+                $this->assertSame('artist', $params['taggingtype']);
+                $this->assertSame('10', $params['limit']);
+                $this->assertSame('2', $params['page']);
+
+                return true;
+            }))
+            ->willReturn(
+                (string)json_encode(self::personalTagsResponse('artist'))
+            );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getPersonalTags('testuser', 'rock', 'artist', 10, 2);
+    }
+
+    #[Test]
+    public function itUsesDefaultLimitAndPageForPersonalTags(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string)$query, $params);
+                $this->assertSame('50', $params['limit']);
+                $this->assertSame('1', $params['page']);
+
+                return true;
+            }))
+            ->willReturn(
+                (string)json_encode(self::personalTagsResponse('artist'))
+            );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getPersonalTags('rj', 'rock', 'artist');
+    }
+
+    #[Test]
+    public function itParsesPersonalTagArtistImages(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string)json_encode(self::personalTagsResponse('artist'))
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getPersonalTags('rj', 'rock', 'artist');
+
+        $this->assertCount(2, $result->items[0]->images);
+        $this->assertInstanceOf(ImageDto::class, $result->items[0]->images[0]);
+        $this->assertSame('small', $result->items[0]->images[0]->size);
+    }
+
+    #[Test]
+    public function itThrowsOnInvalidTaggingType(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            "Invalid tagging type 'invalid'. Must be one of: artist, album, track."
+        );
+
+        $client->user()->getPersonalTags('rj', 'rock', 'invalid');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function personalTagsResponse(string $type): array
+    {
+        $typeMap = [
+            'artist' => [
+                'plural' => 'artists',
+                'singular' => 'artist',
+                'items' => [
+                    self::personalTagArtistItem('Jack Bruce'),
+                    self::personalTagArtistItem('Afghan Whigs'),
+                ],
+            ],
+            'track' => [
+                'plural' => 'tracks',
+                'singular' => 'track',
+                'items' => [
+                    self::personalTagTrackItem('Arc Of A Diver', 'Steve Winwood'),
+                    self::personalTagTrackItem('Finish What Ya Started', 'Van Halen'),
+                ],
+            ],
+            'album' => [
+                'plural' => 'albums',
+                'singular' => 'album',
+                'items' => [
+                    self::personalTagAlbumItem('OK Computer', 'Radiohead'),
+                    self::personalTagAlbumItem('The Bends', 'Radiohead'),
+                ],
+            ],
+        ];
+
+        $config = $typeMap[$type];
+
+        return [
+            'taggings' => [
+                $config['plural'] => [
+                    $config['singular'] => $config['items'],
+                ],
+                '@attr' => [
+                    'user' => 'RJ',
+                    'tag' => 'rock',
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function personalTagArtistItem(string $name): array
+    {
+        return [
+            'name' => $name,
+            'mbid' => 'artist-mbid-123',
+            'url' => "https://www.last.fm/music/" . urlencode($name),
+            'streamable' => '0',
+            'image' => self::imageData(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function personalTagTrackItem(
+        string $track,
+        string $artist,
+    ): array {
+        return [
+            'name' => $track,
+            'duration' => 'FIXME',
+            'mbid' => 'track-mbid-123',
+            'url' => "https://www.last.fm/music/{$artist}/_/{$track}",
+            'streamable' => ['#text' => '0', 'fulltrack' => '0'],
+            'artist' => [
+                'name' => $artist,
+                'mbid' => 'artist-mbid-456',
+                'url' => "https://www.last.fm/music/{$artist}",
+            ],
+            'image' => self::imageData(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function personalTagAlbumItem(
+        string $album,
+        string $artist,
+    ): array {
+        return [
+            'name' => $album,
+            'mbid' => 'album-mbid-789',
+            'url' => "https://www.last.fm/music/{$artist}/{$album}",
+            'artist' => [
+                'name' => $artist,
+                'mbid' => 'artist-mbid-123',
+                'url' => "https://www.last.fm/music/{$artist}",
+            ],
+            'image' => self::imageData(),
         ];
     }
 
