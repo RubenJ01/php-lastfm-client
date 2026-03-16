@@ -39,19 +39,21 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 
 ## Available Endpoints
 
-| Service   | Method         | Description                              | Docs                                     |
-|-----------|----------------|------------------------------------------|------------------------------------------|
-| `chart`   | `getTopArtists`  | Get the top artists chart                | [View](docs/chart/getTopArtists.md)      |
-| `chart`   | `getTopTags`     | Get the top tags chart                   | [View](docs/chart/getTopTags.md)         |
-| `chart`   | `getTopTracks`   | Get the top tracks chart                 | [View](docs/chart/getTopTracks.md)       |
-| `geo`     | `getTopArtists`  | Get the top artists by country           | [View](docs/geo/getTopArtists.md)        |
-| `geo`     | `getTopTracks`   | Get the top tracks by country            | [View](docs/geo/getTopTracks.md)         |
-| `user`    | `getInfo`        | Get information about a user profile     | [View](docs/user/getInfo.md)             |
-| `user`    | `getLovedTracks` | Get a user's loved tracks                | [View](docs/user/getLovedTracks.md)      |
-| `library` | `getArtists`     | Get all artists in a user's library      | [View](docs/library/getArtists.md)       |
-| `track`   | `scrobble`       | Scrobble a track to a user's profile     | [View](docs/track/scrobble.md)           |
-| `auth`    | `getToken`       | Get a request token for authentication   | [View](docs/auth/authentication.md)      |
-| `auth`    | `getSession`     | Exchange an authorized token for session | [View](docs/auth/authentication.md)      |
+| Service   | Method            | Description                              | Docs                                     |
+|-----------|-------------------|------------------------------------------|------------------------------------------|
+| `chart`   | `getTopArtists`   | Get the top artists chart                | [View](docs/chart/getTopArtists.md)      |
+| `chart`   | `getTopTags`      | Get the top tags chart                   | [View](docs/chart/getTopTags.md)         |
+| `chart`   | `getTopTracks`    | Get the top tracks chart                 | [View](docs/chart/getTopTracks.md)       |
+| `geo`     | `getTopArtists`   | Get the top artists by country           | [View](docs/geo/getTopArtists.md)        |
+| `geo`     | `getTopTracks`    | Get the top tracks by country            | [View](docs/geo/getTopTracks.md)         |
+| `user`    | `getInfo`         | Get information about a user profile     | [View](docs/user/getInfo.md)             |
+| `user`    | `getFriends`      | Get a user's friends                     | [View](docs/user/getFriends.md)          |
+| `user`    | `getLovedTracks`  | Get a user's loved tracks                | [View](docs/user/getLovedTracks.md)      |
+| `user`    | `getPersonalTags` | Get items a user has tagged              | [View](docs/user/getPersonalTags.md)     |
+| `library` | `getArtists`      | Get all artists in a user's library      | [View](docs/library/getArtists.md)       |
+| `track`   | `scrobble`        | Scrobble a track to a user's profile     | [View](docs/track/scrobble.md)           |
+| `auth`    | `getToken`        | Get a request token for authentication   | [View](docs/auth/authentication.md)      |
+| `auth`    | `getSession`      | Exchange an authorized token for session | [View](docs/auth/authentication.md)      |
 
 ## Authentication
 
