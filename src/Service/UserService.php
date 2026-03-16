@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Service;
 
 use Rjds\PhpLastfmClient\Dto\Common\PaginatedResponse;
+use Rjds\PhpLastfmClient\Dto\User\FriendDto;
 use Rjds\PhpLastfmClient\Dto\User\LovedTrackDto;
 use Rjds\PhpLastfmClient\Dto\User\UserDto;
 
@@ -39,5 +40,21 @@ final readonly class UserService extends AbstractService
             'limit' => $limit,
             'page' => $page,
         ], 'lovedtracks', 'track', LovedTrackDto::class);
+    }
+
+    /**
+     * Get a paginated list of a users friends.
+     *
+     * @see https://lastfm-docs.github.io/api-docs/user/getFriends/
+     *
+     * @return PaginatedResponse<FriendDto>
+     */
+    public function getFriends(string $user, int $limit = 50, int $page = 1): PaginatedResponse
+    {
+        return $this->paginate('user.getfriends', [
+            'user' => $user,
+            'limit' => $limit,
+            'page' => $page,
+        ], 'friends', 'user', FriendDto::class);
     }
 }

@@ -7,6 +7,7 @@ namespace Rjds\PhpLastfmClient\Tests\Service;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\User\FriendDto;
 use Rjds\PhpLastfmClient\Dto\User\LovedTrackDto;
 use Rjds\PhpLastfmClient\Dto\User\UserDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
@@ -15,11 +16,112 @@ use Rjds\PhpLastfmClient\LastfmClient;
 final class UserServiceTest extends TestCase
 {
     #[Test]
+    public function itReturnsFriendDto(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')
+            ->willReturn((string)json_encode(self::friendsResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getFriends('aidan-');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(FriendDto::class, $result->items[0]);
+        $this->assertSame('oldmaneatintwix', $result->items[0]->name);
+        $this->assertSame('newmaneatintwix', $result->items[1]->name);
+    }
+
+    #[Test]
+    public function itReturnsPaginationForFriends(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')
+            ->willReturn(
+                (string)json_encode(self::friendsResponse())
+            );
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getFriends('aidan-');
+
+        $this->assertSame(1, $result->pagination->page);
+        $this->assertSame(1, $result->pagination->perPage);
+        $this->assertSame(10, $result->pagination->total);
+        $this->assertSame(10, $result->pagination->totalPages);
+    }
+
+    #[Test]
+    public function itCallsGetFriendsWithCorrectParams(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string)$query, $params);
+                $this->assertSame('user.getfriends', $params['method']);
+                $this->assertSame('aidan-', $params['user']);
+                $this->assertSame('10', $params['limit']);
+                $this->assertSame('1', $params['page']);
+
+                return true;
+            }))
+            ->willReturn(
+                (string)json_encode(self::friendsResponse())
+            );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getFriends('aidan-', 10);
+    }
+
+    #[Test]
+    public function itUsesDefaultLimitAndPageForFriends(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string)$query, $params);
+                $this->assertSame('50', $params['limit']);
+                $this->assertSame('1', $params['page']);
+
+                return true;
+            }))
+            ->willReturn(
+                (string)json_encode(self::friendsResponse())
+            );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getFriends('aidan-');
+    }
+
+    #[Test]
+    public function itParsesFriendsImages(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')
+            ->willReturn(
+                (string)json_encode(self::friendsResponse())
+            );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getFriends('aidan-');
+
+        $this->assertCount(2, $result->items[0]->images);
+        $this->assertInstanceOf(
+            ImageDto::class,
+            $result->items[0]->images[0],
+        );
+        $this->assertSame('small', $result->items[0]->images[0]->size);
+    }
+
+    #[Test]
     public function itReturnsUserDto(): void
     {
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient->method('get')
-            ->willReturn((string) json_encode(self::userGetInfoResponse()));
+            ->willReturn((string)json_encode(self::getInfoResponse()));
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $user = $client->user()->getInfo('rj');
@@ -39,13 +141,13 @@ final class UserServiceTest extends TestCase
             ->method('get')
             ->with($this->callback(function (string $url): bool {
                 $this->assertIsString(parse_url($url, PHP_URL_QUERY));
-                parse_str((string) parse_url($url, PHP_URL_QUERY), $params);
+                parse_str((string)parse_url($url, PHP_URL_QUERY), $params);
                 $this->assertSame('user.getinfo', $params['method']);
                 $this->assertSame('testuser', $params['user']);
 
                 return true;
             }))
-            ->willReturn((string) json_encode(self::userGetInfoResponse('testuser')));
+            ->willReturn((string)json_encode(self::getInfoResponse('testuser')));
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
         $client->user()->getInfo('testuser');
@@ -57,7 +159,7 @@ final class UserServiceTest extends TestCase
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient->method('get')
             ->willReturn(
-                (string) json_encode(self::lovedTracksResponse())
+                (string)json_encode(self::lovedTracksResponse())
             );
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
@@ -77,7 +179,7 @@ final class UserServiceTest extends TestCase
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient->method('get')
             ->willReturn(
-                (string) json_encode(self::lovedTracksResponse())
+                (string)json_encode(self::lovedTracksResponse())
             );
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
@@ -98,7 +200,7 @@ final class UserServiceTest extends TestCase
             ->with($this->callback(function (string $url): bool {
                 $query = parse_url($url, PHP_URL_QUERY);
                 $this->assertIsString($query);
-                parse_str((string) $query, $params);
+                parse_str((string)$query, $params);
                 $this->assertSame('user.getlovedtracks', $params['method']);
                 $this->assertSame('testuser', $params['user']);
                 $this->assertSame('10', $params['limit']);
@@ -107,7 +209,7 @@ final class UserServiceTest extends TestCase
                 return true;
             }))
             ->willReturn(
-                (string) json_encode(self::lovedTracksResponse())
+                (string)json_encode(self::lovedTracksResponse())
             );
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
@@ -123,14 +225,14 @@ final class UserServiceTest extends TestCase
             ->with($this->callback(function (string $url): bool {
                 $query = parse_url($url, PHP_URL_QUERY);
                 $this->assertIsString($query);
-                parse_str((string) $query, $params);
+                parse_str((string)$query, $params);
                 $this->assertSame('50', $params['limit']);
                 $this->assertSame('1', $params['page']);
 
                 return true;
             }))
             ->willReturn(
-                (string) json_encode(self::lovedTracksResponse())
+                (string)json_encode(self::lovedTracksResponse())
             );
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
@@ -143,7 +245,7 @@ final class UserServiceTest extends TestCase
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient->method('get')
             ->willReturn(
-                (string) json_encode(self::lovedTracksResponse())
+                (string)json_encode(self::lovedTracksResponse())
             );
 
         $client = new LastfmClient('test-api-key', httpClient: $httpClient);
@@ -160,7 +262,7 @@ final class UserServiceTest extends TestCase
     /**
      * @return array{user: array<string, mixed>}
      */
-    private static function userGetInfoResponse(string $name = 'RJ'): array
+    private static function getInfoResponse(string $name = 'RJ'): array
     {
         return [
             'user' => [
@@ -209,6 +311,51 @@ final class UserServiceTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    private static function friendsResponse(): array
+    {
+        return [
+            'friends' => [
+                'user' => [
+                    self::friendItem('oldmaneatintwix'),
+                    self::friendItem('newmaneatintwix'),
+                ],
+                "@attr" => [
+                    'page' => '1',
+                    'total' => '10',
+                    'user' => 'aidan-',
+                    'perPage' => '1',
+                    'totalPages' => '10'
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function friendItem(string $name): array
+    {
+        return [
+            'playlists' => '0',
+            'playcount' => '4',
+            'subscriber' => '0',
+            'name' => $name,
+            'country' => 'United Kingdom',
+            'image' => self::imageData(),
+            'registered' => [
+                'unixtime' => '160318968',
+                '#text' => '2020-10-20 10:28',
+            ],
+            'url' => "https://www.last.fm/user/{$name}",
+            'realname' => 'Charlie Brown',
+            'bootstrap' => '0',
+            'type' => 'user',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     private static function lovedTrackItem(
         string $track,
         string $artist,
@@ -236,7 +383,7 @@ final class UserServiceTest extends TestCase
 
     /**
      * @return list<array{size: string, '#text': string}>
-     */
+    */
     private static function imageData(): array
     {
         return [
