@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Dto\Common;
 
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToArray;
 use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 /**
@@ -13,6 +14,7 @@ use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
  */
 final readonly class PaginatedResponse
 {
+    use HasToArray;
     use HasToString;
 
     /**
