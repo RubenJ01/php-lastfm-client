@@ -6,10 +6,12 @@ use Rjds\PhpDto\Attribute\ArrayOf;
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
 use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToArray;
 use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 class FriendDto
 {
+    use HasToArray;
     use HasToString;
 
     /**
