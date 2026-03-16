@@ -7,9 +7,12 @@ namespace Rjds\PhpLastfmClient\Dto\User;
 use Rjds\PhpDto\Attribute\ArrayOf;
 use Rjds\PhpDto\Attribute\MapFrom;
 use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 final readonly class PersonalTagAlbumDto
 {
+    use HasToString;
+
     /**
      * @param list<ImageDto> $images
      */

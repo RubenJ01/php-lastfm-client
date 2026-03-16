@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Dto\Track;
 
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
+
 /**
  * Represents a single scrobble to submit.
  */
 final readonly class Scrobble
 {
+    use HasToString;
+
     public function __construct(
         public string $artist,
         public string $track,

@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Rjds\PhpLastfmClient\Dto\Track;
 
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
+
 final readonly class ScrobbleResponseDto
 {
+    use HasToString;
+
     /**
      * @param list<ScrobbleResultDto> $scrobbles
      */

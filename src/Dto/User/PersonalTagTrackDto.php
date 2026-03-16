@@ -8,9 +8,12 @@ use Rjds\PhpDto\Attribute\ArrayOf;
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
 use Rjds\PhpLastfmClient\Dto\Common\ImageDto;
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 final readonly class PersonalTagTrackDto
 {
+    use HasToString;
+
     /**
      * @param list<ImageDto> $images
      */

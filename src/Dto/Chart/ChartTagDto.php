@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Rjds\PhpLastfmClient\Dto\Chart;
 
 use Rjds\PhpDto\Attribute\CastTo;
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 final readonly class ChartTagDto
 {
+    use HasToString;
+
     public function __construct(
         public string $name,
         public string $url,

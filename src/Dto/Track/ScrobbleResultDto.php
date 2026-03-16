@@ -6,9 +6,12 @@ namespace Rjds\PhpLastfmClient\Dto\Track;
 
 use Rjds\PhpDto\Attribute\CastTo;
 use Rjds\PhpDto\Attribute\MapFrom;
+use Rjds\PhpLastfmClient\Dto\Concerns\HasToString;
 
 final readonly class ScrobbleResultDto
 {
+    use HasToString;
+
     public function __construct(
         #[MapFrom('track.#text')]
         public string $track,
