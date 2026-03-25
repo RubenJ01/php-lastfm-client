@@ -46,3 +46,12 @@ See the [authentication guide](auth/authentication.md) for the full flow.
 | [`getFriends`](user/getFriends.md)                | Get a user's friends             |
 | [`getLovedTracks`](user/getLovedTracks.md)        | Get a user's loved tracks        |
 | [`getPersonalTags`](user/getPersonalTags.md)      | Get items a user has tagged      |
+| [`getRecentTracks`](user/getRecentTracks.md)      | Get a user's recent tracks       |
+| [`getTopAlbums`](user/getTopAlbums.md)            | Get a user's top albums          |
+| [`getTopArtists`](user/getTopArtists.md)          | Get a user's top artists         |
+| [`getTopTags`](user/getTopTags.md)                | Get a user's top tags            |
+| [`getTopTracks`](user/getTopTracks.md)            | Get a user's top tracks          |
+| [`getWeeklyAlbumChart`](user/getWeeklyAlbumChart.md) | Get a weekly album chart      |
+| [`getWeeklyArtistChart`](user/getWeeklyArtistChart.md) | Get a weekly artist chart    |
+| [`getWeeklyChartList`](user/getWeeklyChartList.md) | Get weekly chart date ranges   |
+| [`getWeeklyTrackChart`](user/getWeeklyTrackChart.md) | Get a weekly track chart      |
