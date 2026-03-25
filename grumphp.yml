@@ -7,6 +7,7 @@ grumphp:
                 - /^tests\/(.*)/
         phpstan:
             configuration: phpstan.neon
+            memory_limit: "-1"
             ignore_patterns:
                 - "configure.php"
         phpunit: ~
