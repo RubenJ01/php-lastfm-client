@@ -3,12 +3,6 @@
     "description": "A client that integrates the LastFM API",
     "type": "library",
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://ruben-jakob-digital-solutions.repo.repman.rubenjakob.com"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Rjds\\PhpLastfmClient\\": "src/"
@@ -27,7 +21,7 @@
     ],
     "require": {
         "php": "^8.4",
-        "rjds/php-dto": "^1.0"
+        "rjds/php-dto": "^1.1"
     },
     "require-dev": {
         "phpro/grumphp": "^2.19",
