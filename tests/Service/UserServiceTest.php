@@ -687,6 +687,21 @@ final class UserServiceTest extends TestCase
     }
 
     #[Test]
+    public function itNormalizesRecentTracksWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string) json_encode(self::recentTracksSingleObjectResponse())
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getRecentTracks('rj');
+
+        $this->assertCount(1, $result->items);
+        $this->assertSame('Karma Police', $result->items[0]->name);
+    }
+
+    #[Test]
     public function itCallsGetRecentTracksWithCorrectParams(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
@@ -812,6 +827,20 @@ final class UserServiceTest extends TestCase
     }
 
     #[Test]
+    public function itNormalizesWeeklyChartListWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyChartListSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $ranges = $client->user()->getWeeklyChartList('rj');
+
+        $this->assertCount(1, $ranges);
+        $this->assertSame(100, $ranges[0]->from);
+        $this->assertSame(200, $ranges[0]->to);
+    }
+
+    #[Test]
     public function itReturnsWeeklyArtistChart(): void
     {
         $httpClient = $this->createStub(HttpClientInterface::class);
@@ -822,6 +851,42 @@ final class UserServiceTest extends TestCase
 
         $this->assertCount(2, $items);
         $this->assertInstanceOf(WeeklyArtistChartItemDto::class, $items[0]);
+        $this->assertSame('Radiohead', $items[0]->name);
+    }
+
+    #[Test]
+    public function itCallsWeeklyArtistChartWithFromAndTo(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string) $query, $params);
+                $this->assertSame('user.getweeklyartistchart', $params['method']);
+                $this->assertSame('rj', $params['user']);
+                $this->assertSame('100', $params['from']);
+                $this->assertSame('200', $params['to']);
+
+                return true;
+            }))
+            ->willReturn((string) json_encode(self::weeklyArtistChartResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getWeeklyArtistChart('rj', from: 100, to: 200);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyArtistChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyArtistChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyArtistChart('rj');
+
+        $this->assertCount(1, $items);
         $this->assertSame('Radiohead', $items[0]->name);
     }
 
@@ -841,6 +906,19 @@ final class UserServiceTest extends TestCase
     }
 
     #[Test]
+    public function itNormalizesWeeklyAlbumChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyAlbumChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyAlbumChart('rj');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('OK Computer', $items[0]->name);
+    }
+
+    #[Test]
     public function itReturnsWeeklyTrackChart(): void
     {
         $httpClient = $this->createStub(HttpClientInterface::class);
@@ -853,6 +931,19 @@ final class UserServiceTest extends TestCase
         $this->assertInstanceOf(WeeklyTrackChartItemDto::class, $items[0]);
         $this->assertSame('Karma Police', $items[0]->name);
         $this->assertSame('Radiohead', $items[0]->artistName);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyTrackChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyTrackChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyTrackChart('rj');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('Karma Police', $items[0]->name);
     }
 
     /**
@@ -904,6 +995,24 @@ final class UserServiceTest extends TestCase
                     'total' => '20',
                     'user' => 'rj',
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function recentTracksSingleObjectResponse(): array
+    {
+        /** @var array{recenttracks: array{track: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::recentTracksResponse();
+
+        $first = $data['recenttracks']['track'][0];
+
+        return [
+            'recenttracks' => [
+                'track' => $first,
+                '@attr' => $data['recenttracks']['@attr'],
             ],
         ];
     }
@@ -1079,6 +1188,24 @@ final class UserServiceTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    private static function weeklyChartListSingleObjectResponse(): array
+    {
+        return [
+            'weeklychartlist' => [
+                'chart' => [
+                    'from' => '100',
+                    'to' => '200',
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     private static function weeklyArtistChartResponse(): array
     {
         return [
@@ -1106,6 +1233,24 @@ final class UserServiceTest extends TestCase
                     'from' => '100',
                     'to' => '200',
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyArtistChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklyartistchart: array{artist: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyArtistChartResponse();
+
+        $first = $data['weeklyartistchart']['artist'][0];
+
+        return [
+            'weeklyartistchart' => [
+                'artist' => $first,
+                '@attr' => $data['weeklyartistchart']['@attr'],
             ],
         ];
     }
@@ -1149,6 +1294,24 @@ final class UserServiceTest extends TestCase
     /**
      * @return array<string, mixed>
      */
+    private static function weeklyAlbumChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklyalbumchart: array{album: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyAlbumChartResponse();
+
+        $first = $data['weeklyalbumchart']['album'][0];
+
+        return [
+            'weeklyalbumchart' => [
+                'album' => $first,
+                '@attr' => $data['weeklyalbumchart']['@attr'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     private static function weeklyTrackChartResponse(): array
     {
         return [
@@ -1178,6 +1341,24 @@ final class UserServiceTest extends TestCase
                     'from' => '100',
                     'to' => '200',
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyTrackChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklytrackchart: array{track: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyTrackChartResponse();
+
+        $first = $data['weeklytrackchart']['track'][0];
+
+        return [
+            'weeklytrackchart' => [
+                'track' => $first,
+                '@attr' => $data['weeklytrackchart']['@attr'],
             ],
         ];
     }
