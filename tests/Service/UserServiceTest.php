@@ -12,7 +12,16 @@ use Rjds\PhpLastfmClient\Dto\User\LovedTrackDto;
 use Rjds\PhpLastfmClient\Dto\User\PersonalTagAlbumDto;
 use Rjds\PhpLastfmClient\Dto\User\PersonalTagArtistDto;
 use Rjds\PhpLastfmClient\Dto\User\PersonalTagTrackDto;
+use Rjds\PhpLastfmClient\Dto\User\RecentTrackDto;
 use Rjds\PhpLastfmClient\Dto\User\UserDto;
+use Rjds\PhpLastfmClient\Dto\User\UserTopAlbumDto;
+use Rjds\PhpLastfmClient\Dto\User\UserTopArtistDto;
+use Rjds\PhpLastfmClient\Dto\User\UserTopTagDto;
+use Rjds\PhpLastfmClient\Dto\User\UserTopTrackDto;
+use Rjds\PhpLastfmClient\Dto\User\WeeklyAlbumChartItemDto;
+use Rjds\PhpLastfmClient\Dto\User\WeeklyArtistChartItemDto;
+use Rjds\PhpLastfmClient\Dto\User\WeeklyChartRangeDto;
+use Rjds\PhpLastfmClient\Dto\User\WeeklyTrackChartItemDto;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
 
@@ -652,6 +661,704 @@ final class UserServiceTest extends TestCase
             [
                 'size' => 'large',
                 '#text' => 'https://lastfm.freetls.fastly.net/i/u/174s/img.png',
+            ],
+        ];
+    }
+
+    #[Test]
+    public function itReturnsRecentTracks(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string) json_encode(self::recentTracksResponse())
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getRecentTracks('rj');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(RecentTrackDto::class, $result->items[0]);
+        $this->assertSame('Karma Police', $result->items[0]->name);
+        $this->assertSame('Radiohead', $result->items[0]->artistName);
+        $this->assertFalse($result->items[0]->nowPlaying);
+
+        $this->assertTrue($result->items[1]->nowPlaying);
+        $this->assertNull($result->items[1]->scrobbledAt);
+    }
+
+    #[Test]
+    public function itNormalizesRecentTracksWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn(
+            (string) json_encode(self::recentTracksSingleObjectResponse())
+        );
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getRecentTracks('rj');
+
+        $this->assertCount(1, $result->items);
+        $this->assertSame('Karma Police', $result->items[0]->name);
+    }
+
+    #[Test]
+    public function itCallsGetRecentTracksWithCorrectParams(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string) $query, $params);
+                $this->assertSame('user.getrecenttracks', $params['method']);
+                $this->assertSame('testuser', $params['user']);
+                $this->assertSame('10', $params['limit']);
+                $this->assertSame('3', $params['page']);
+                $this->assertSame('100', $params['from']);
+                $this->assertSame('200', $params['to']);
+                $this->assertSame('1', $params['extended']);
+
+                return true;
+            }))
+            ->willReturn((string) json_encode(self::recentTracksResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getRecentTracks('testuser', limit: 10, page: 3, from: 100, to: 200, extended: true);
+    }
+
+    #[Test]
+    public function itReturnsTopArtists(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::topArtistsResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getTopArtists('rj');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(UserTopArtistDto::class, $result->items[0]);
+        $this->assertSame('Radiohead', $result->items[0]->name);
+        $this->assertSame(1, $result->items[0]->rank);
+    }
+
+    #[Test]
+    public function itCallsGetTopArtistsWithCorrectParams(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string) $query, $params);
+                $this->assertSame('user.gettopartists', $params['method']);
+                $this->assertSame('testuser', $params['user']);
+                $this->assertSame('7day', $params['period']);
+                $this->assertSame('10', $params['limit']);
+                $this->assertSame('2', $params['page']);
+
+                return true;
+            }))
+            ->willReturn((string) json_encode(self::topArtistsResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getTopArtists('testuser', period: '7day', limit: 10, page: 2);
+    }
+
+    #[Test]
+    public function itReturnsTopAlbums(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::topAlbumsResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getTopAlbums('rj');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(UserTopAlbumDto::class, $result->items[0]);
+        $this->assertSame('OK Computer', $result->items[0]->name);
+        $this->assertSame('Radiohead', $result->items[0]->artistName);
+    }
+
+    #[Test]
+    public function itReturnsTopTracks(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::topTracksResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getTopTracks('rj');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(UserTopTrackDto::class, $result->items[0]);
+        $this->assertSame('Karma Police', $result->items[0]->name);
+        $this->assertSame('Radiohead', $result->items[0]->artistName);
+    }
+
+    #[Test]
+    public function itReturnsTopTags(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::topTagsResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $result = $client->user()->getTopTags('rj');
+
+        $this->assertCount(2, $result->items);
+        $this->assertInstanceOf(UserTopTagDto::class, $result->items[0]);
+        $this->assertSame('rock', $result->items[0]->name);
+        $this->assertSame(100, $result->items[0]->count);
+    }
+
+    #[Test]
+    public function itReturnsWeeklyChartList(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyChartListResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $ranges = $client->user()->getWeeklyChartList('rj');
+
+        $this->assertCount(2, $ranges);
+        $this->assertInstanceOf(WeeklyChartRangeDto::class, $ranges[0]);
+        $this->assertSame(100, $ranges[0]->from);
+        $this->assertSame(200, $ranges[0]->to);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyChartListWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyChartListSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $ranges = $client->user()->getWeeklyChartList('rj');
+
+        $this->assertCount(1, $ranges);
+        $this->assertSame(100, $ranges[0]->from);
+        $this->assertSame(200, $ranges[0]->to);
+    }
+
+    #[Test]
+    public function itReturnsWeeklyArtistChart(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyArtistChartResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyArtistChart('rj');
+
+        $this->assertCount(2, $items);
+        $this->assertInstanceOf(WeeklyArtistChartItemDto::class, $items[0]);
+        $this->assertSame('Radiohead', $items[0]->name);
+    }
+
+    #[Test]
+    public function itCallsWeeklyArtistChartWithFromAndTo(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $url): bool {
+                $query = parse_url($url, PHP_URL_QUERY);
+                $this->assertIsString($query);
+                parse_str((string) $query, $params);
+                $this->assertSame('user.getweeklyartistchart', $params['method']);
+                $this->assertSame('rj', $params['user']);
+                $this->assertSame('100', $params['from']);
+                $this->assertSame('200', $params['to']);
+
+                return true;
+            }))
+            ->willReturn((string) json_encode(self::weeklyArtistChartResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $client->user()->getWeeklyArtistChart('rj', from: 100, to: 200);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyArtistChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyArtistChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyArtistChart('rj');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('Radiohead', $items[0]->name);
+    }
+
+    #[Test]
+    public function itReturnsWeeklyAlbumChart(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyAlbumChartResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyAlbumChart('rj');
+
+        $this->assertCount(2, $items);
+        $this->assertInstanceOf(WeeklyAlbumChartItemDto::class, $items[0]);
+        $this->assertSame('OK Computer', $items[0]->name);
+        $this->assertSame('Radiohead', $items[0]->artistName);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyAlbumChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyAlbumChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyAlbumChart('rj');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('OK Computer', $items[0]->name);
+    }
+
+    #[Test]
+    public function itReturnsWeeklyTrackChart(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyTrackChartResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyTrackChart('rj');
+
+        $this->assertCount(2, $items);
+        $this->assertInstanceOf(WeeklyTrackChartItemDto::class, $items[0]);
+        $this->assertSame('Karma Police', $items[0]->name);
+        $this->assertSame('Radiohead', $items[0]->artistName);
+    }
+
+    #[Test]
+    public function itNormalizesWeeklyTrackChartWhenSingleObjectReturned(): void
+    {
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn((string) json_encode(self::weeklyTrackChartSingleObjectResponse()));
+
+        $client = new LastfmClient('test-api-key', httpClient: $httpClient);
+        $items = $client->user()->getWeeklyTrackChart('rj');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('Karma Police', $items[0]->name);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function recentTracksResponse(): array
+    {
+        return [
+            'recenttracks' => [
+                'track' => [
+                    [
+                        'name' => 'Karma Police',
+                        'mbid' => 'track-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Karma+Police',
+                        'artist' => [
+                            '#text' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                        ],
+                        'album' => [
+                            '#text' => 'OK Computer',
+                        ],
+                        'image' => self::imageData(),
+                        'date' => [
+                            'uts' => '1603112664',
+                            '#text' => '19 Oct 2020, 13:04',
+                        ],
+                    ],
+                    [
+                        'name' => 'Paranoid Android',
+                        'mbid' => 'track-mbid-2',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Paranoid+Android',
+                        'artist' => [
+                            '#text' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                        ],
+                        'album' => [
+                            '#text' => 'OK Computer',
+                        ],
+                        'image' => self::imageData(),
+                        '@attr' => [
+                            'nowplaying' => 'true',
+                        ],
+                    ],
+                ],
+                '@attr' => [
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function recentTracksSingleObjectResponse(): array
+    {
+        /** @var array{recenttracks: array{track: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::recentTracksResponse();
+
+        $first = $data['recenttracks']['track'][0];
+
+        return [
+            'recenttracks' => [
+                'track' => $first,
+                '@attr' => $data['recenttracks']['@attr'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function topArtistsResponse(): array
+    {
+        return [
+            'topartists' => [
+                'artist' => [
+                    [
+                        'name' => 'Radiohead',
+                        'mbid' => 'artist-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead',
+                        'playcount' => '100',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'The National',
+                        'mbid' => 'artist-mbid-2',
+                        'url' => 'https://www.last.fm/music/The+National',
+                        'playcount' => '90',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function topAlbumsResponse(): array
+    {
+        return [
+            'topalbums' => [
+                'album' => [
+                    [
+                        'name' => 'OK Computer',
+                        'mbid' => 'album-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead/OK+Computer',
+                        'playcount' => '50',
+                        'artist' => [
+                            'name' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                            'url' => 'https://www.last.fm/music/Radiohead',
+                        ],
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'In Rainbows',
+                        'mbid' => 'album-mbid-2',
+                        'url' => 'https://www.last.fm/music/Radiohead/In+Rainbows',
+                        'playcount' => '40',
+                        'artist' => [
+                            'name' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                            'url' => 'https://www.last.fm/music/Radiohead',
+                        ],
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function topTracksResponse(): array
+    {
+        return [
+            'toptracks' => [
+                'track' => [
+                    [
+                        'name' => 'Karma Police',
+                        'mbid' => 'track-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Karma+Police',
+                        'playcount' => '25',
+                        'artist' => [
+                            'name' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                            'url' => 'https://www.last.fm/music/Radiohead',
+                        ],
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'Paranoid Android',
+                        'mbid' => 'track-mbid-2',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Paranoid+Android',
+                        'playcount' => '24',
+                        'artist' => [
+                            'name' => 'Radiohead',
+                            'mbid' => 'artist-mbid-1',
+                            'url' => 'https://www.last.fm/music/Radiohead',
+                        ],
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function topTagsResponse(): array
+    {
+        return [
+            'toptags' => [
+                'tag' => [
+                    ['name' => 'rock', 'url' => 'https://www.last.fm/tag/rock', 'count' => '100'],
+                    ['name' => 'alternative', 'url' => 'https://www.last.fm/tag/alternative', 'count' => '90'],
+                ],
+                '@attr' => [
+                    'page' => '1',
+                    'perPage' => '2',
+                    'totalPages' => '10',
+                    'total' => '20',
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyChartListResponse(): array
+    {
+        return [
+            'weeklychartlist' => [
+                'chart' => [
+                    ['from' => '100', 'to' => '200'],
+                    ['from' => '200', 'to' => '300'],
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyChartListSingleObjectResponse(): array
+    {
+        return [
+            'weeklychartlist' => [
+                'chart' => [
+                    'from' => '100',
+                    'to' => '200',
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyArtistChartResponse(): array
+    {
+        return [
+            'weeklyartistchart' => [
+                'artist' => [
+                    [
+                        'name' => 'Radiohead',
+                        'mbid' => 'artist-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead',
+                        'playcount' => '10',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'The National',
+                        'mbid' => 'artist-mbid-2',
+                        'url' => 'https://www.last.fm/music/The+National',
+                        'playcount' => '9',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                    'from' => '100',
+                    'to' => '200',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyArtistChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklyartistchart: array{artist: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyArtistChartResponse();
+
+        $first = $data['weeklyartistchart']['artist'][0];
+
+        return [
+            'weeklyartistchart' => [
+                'artist' => $first,
+                '@attr' => $data['weeklyartistchart']['@attr'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyAlbumChartResponse(): array
+    {
+        return [
+            'weeklyalbumchart' => [
+                'album' => [
+                    [
+                        'name' => 'OK Computer',
+                        'mbid' => 'album-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead/OK+Computer',
+                        'artist' => ['#text' => 'Radiohead', 'mbid' => 'artist-mbid-1'],
+                        'playcount' => '10',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'In Rainbows',
+                        'mbid' => 'album-mbid-2',
+                        'url' => 'https://www.last.fm/music/Radiohead/In+Rainbows',
+                        'artist' => ['#text' => 'Radiohead', 'mbid' => 'artist-mbid-1'],
+                        'playcount' => '9',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                    'from' => '100',
+                    'to' => '200',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyAlbumChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklyalbumchart: array{album: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyAlbumChartResponse();
+
+        $first = $data['weeklyalbumchart']['album'][0];
+
+        return [
+            'weeklyalbumchart' => [
+                'album' => $first,
+                '@attr' => $data['weeklyalbumchart']['@attr'],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyTrackChartResponse(): array
+    {
+        return [
+            'weeklytrackchart' => [
+                'track' => [
+                    [
+                        'name' => 'Karma Police',
+                        'mbid' => 'track-mbid-1',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Karma+Police',
+                        'artist' => ['#text' => 'Radiohead', 'mbid' => 'artist-mbid-1'],
+                        'playcount' => '10',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '1'],
+                    ],
+                    [
+                        'name' => 'Paranoid Android',
+                        'mbid' => 'track-mbid-2',
+                        'url' => 'https://www.last.fm/music/Radiohead/_/Paranoid+Android',
+                        'artist' => ['#text' => 'Radiohead', 'mbid' => 'artist-mbid-1'],
+                        'playcount' => '9',
+                        'image' => self::imageData(),
+                        '@attr' => ['rank' => '2'],
+                    ],
+                ],
+                '@attr' => [
+                    'user' => 'rj',
+                    'from' => '100',
+                    'to' => '200',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function weeklyTrackChartSingleObjectResponse(): array
+    {
+        /** @var array{weeklytrackchart: array{track: list<array<string, mixed>>, '@attr': array<string, mixed>}} $data */
+        $data = self::weeklyTrackChartResponse();
+
+        $first = $data['weeklytrackchart']['track'][0];
+
+        return [
+            'weeklytrackchart' => [
+                'track' => $first,
+                '@attr' => $data['weeklytrackchart']['@attr'],
             ],
         ];
     }
