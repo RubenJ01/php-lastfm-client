@@ -14,7 +14,7 @@ steps:
       - echo "══════ PHP CodeSniffer (PSR-12) ══════"
       - vendor/bin/phpcs --standard=PSR12 src/
       - echo "══════ PHPStan (Level 9) ══════"
-      - vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress
+      - vendor/bin/phpstan analyse --configuration=phpstan.neon --no-progress --memory-limit=-1
       - echo "══════ PHPUnit ══════"
       - vendor/bin/phpunit --colors=always
       - echo "Infection (Mutation Testing)"
