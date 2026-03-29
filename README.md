@@ -40,6 +40,7 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 ## Available Services
 
 - **[Auth](docs/auth/authentication.md)** — token & session authentication
+- **[Artist](docs/api-reference.md#artist)** — artist info, corrections, similar artists, top albums/tracks/tags, search
 - **[Chart](docs/api-reference.md#chart)** — top artists, tags, and tracks charts
 - **[Geo](docs/api-reference.md#geo)** — top artists and tracks by country
 - **[Library](docs/api-reference.md#library)** — user library artists

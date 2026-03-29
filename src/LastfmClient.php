@@ -7,6 +7,7 @@ namespace Rjds\PhpLastfmClient;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\Http\LastfmHttpClient;
+use Rjds\PhpLastfmClient\Service\ArtistService;
 use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\GeoService;
@@ -19,6 +20,7 @@ final class LastfmClient
 {
     private const string BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
+    private ?ArtistService $artistService = null;
     private ?AuthService $authService = null;
     private ?ChartService $chartService = null;
     private ?GeoService $geoService = null;
@@ -33,6 +35,14 @@ final class LastfmClient
         private ?string $sessionKey = null,
         private readonly HttpClientInterface $httpClient = new LastfmHttpClient(),
     ) {
+    }
+
+    /**
+     * Access artist-related API methods.
+     */
+    public function artist(): ArtistService
+    {
+        return $this->artistService ??= new ArtistService($this);
     }
 
     /**

@@ -11,6 +11,19 @@ All available endpoints grouped by service. Click on a method name to view full 
 
 See the [authentication guide](auth/authentication.md) for the full flow.
 
+## Artist
+
+| Method                                            | Description                                |
+|---------------------------------------------------|--------------------------------------------|
+| [`getCorrection`](artist/getCorrection.md)        | Correct a misspelled artist name           |
+| [`getInfo`](artist/getInfo.md)                    | Get artist metadata, bio, similar, tags    |
+| [`getSimilar`](artist/getSimilar.md)              | Get similar artists                        |
+| [`getTags`](artist/getTags.md)                    | Get tags a user applied to an artist       |
+| [`getTopAlbums`](artist/getTopAlbums.md)          | Get an artist’s top albums                 |
+| [`getTopTags`](artist/getTopTags.md)              | Get top community tags for an artist       |
+| [`getTopTracks`](artist/getTopTracks.md)          | Get an artist’s top tracks                 |
+| [`search`](artist/search.md)                      | Search for artists by name                 |
+
 ## Chart
 
 | Method                                       | Description                |
