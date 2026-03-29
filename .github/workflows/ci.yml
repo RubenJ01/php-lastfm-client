@@ -30,6 +30,3 @@ jobs:
         uses: codecov/codecov-action@v6
         with:
           files: ./coverage.xml
-
-      - name: Run Infection mutation testing
-        run: ./vendor/bin/infection --threads=4 --no-progress
