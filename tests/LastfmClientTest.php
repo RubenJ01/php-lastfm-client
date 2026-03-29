@@ -13,6 +13,7 @@ use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\GeoService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
+use Rjds\PhpLastfmClient\Service\TagService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
 
@@ -114,6 +115,22 @@ final class LastfmClientTest extends TestCase
         $client = new LastfmClient('test-api-key');
 
         $this->assertSame($client->track(), $client->track());
+    }
+
+    #[Test]
+    public function itReturnsTagService(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertInstanceOf(TagService::class, $client->tag());
+    }
+
+    #[Test]
+    public function itReturnsSameTagServiceInstance(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertSame($client->tag(), $client->tag());
     }
 
     #[Test]

@@ -43,6 +43,7 @@ echo "Page {$result->pagination->page} of {$result->pagination->totalPages}";
 - **[Chart](docs/api-reference.md#chart)** — top artists, tags, and tracks charts
 - **[Geo](docs/api-reference.md#geo)** — top artists and tracks by country
 - **[Library](docs/api-reference.md#library)** — user library artists
+- **[Tag](docs/api-reference.md#tag)** — tag metadata, similar tags, top albums/artists/tracks, global top tags, weekly chart ranges
 - **[Track](docs/api-reference.md#track)** — scrobbling
 - **[User](docs/api-reference.md#user)** — user info, friends, loved tracks, personal tags
 
