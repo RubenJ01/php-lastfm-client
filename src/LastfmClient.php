@@ -11,6 +11,7 @@ use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\GeoService;
 use Rjds\PhpLastfmClient\Service\LibraryService;
+use Rjds\PhpLastfmClient\Service\TagService;
 use Rjds\PhpLastfmClient\Service\TrackService;
 use Rjds\PhpLastfmClient\Service\UserService;
 
@@ -23,6 +24,7 @@ final class LastfmClient
     private ?GeoService $geoService = null;
     private ?UserService $userService = null;
     private ?LibraryService $libraryService = null;
+    private ?TagService $tagService = null;
     private ?TrackService $trackService = null;
 
     public function __construct(
@@ -79,6 +81,14 @@ final class LastfmClient
     public function track(): TrackService
     {
         return $this->trackService ??= new TrackService($this);
+    }
+
+    /**
+     * Access tag-related API methods.
+     */
+    public function tag(): TagService
+    {
+        return $this->tagService ??= new TagService($this);
     }
 
     /**

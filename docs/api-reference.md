@@ -32,6 +32,18 @@ See the [authentication guide](auth/authentication.md) for the full flow.
 |----------------------------------------------|--------------------------------------|
 | [`getArtists`](library/getArtists.md)        | Get all artists in a user's library  |
 
+## Tag
+
+| Method                                            | Description                              |
+|---------------------------------------------------|------------------------------------------|
+| [`getInfo`](tag/getInfo.md)                       | Get metadata and wiki for a tag          |
+| [`getSimilar`](tag/getSimilar.md)               | Get tags similar to a tag                |
+| [`getTopAlbums`](tag/getTopAlbums.md)             | Get top albums for a tag                 |
+| [`getTopArtists`](tag/getTopArtists.md)           | Get top artists for a tag                |
+| [`getTopTags`](tag/getTopTags.md)                 | Get global top tags (by popularity)      |
+| [`getTopTracks`](tag/getTopTracks.md)             | Get top tracks for a tag                   |
+| [`getWeeklyChartList`](tag/getWeeklyChartList.md) | Get weekly chart date ranges for a tag   |
+
 ## Track
 
 | Method                                       | Description                          |
