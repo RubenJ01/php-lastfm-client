@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Rjds\PhpLastfmClient\Exception\LastfmApiException;
 use Rjds\PhpLastfmClient\Http\HttpClientInterface;
 use Rjds\PhpLastfmClient\LastfmClient;
+use Rjds\PhpLastfmClient\Service\ArtistService;
 use Rjds\PhpLastfmClient\Service\AuthService;
 use Rjds\PhpLastfmClient\Service\ChartService;
 use Rjds\PhpLastfmClient\Service\GeoService;
@@ -20,6 +21,22 @@ use Rjds\PhpLastfmClient\Service\UserService;
 final class LastfmClientTest extends TestCase
 {
     // ── Service accessors ──────────────────────────────────────────
+
+    #[Test]
+    public function itReturnsArtistService(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertInstanceOf(ArtistService::class, $client->artist());
+    }
+
+    #[Test]
+    public function itReturnsSameArtistServiceInstance(): void
+    {
+        $client = new LastfmClient('test-api-key');
+
+        $this->assertSame($client->artist(), $client->artist());
+    }
 
     #[Test]
     public function itReturnsAuthService(): void
