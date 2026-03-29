@@ -111,12 +111,6 @@ composer install
 php vendor/bin/grumphp run
 ```
 
-Run mutation testing:
-
-```bash
-php vendor/bin/infection --threads=4
-```
-
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ## License
