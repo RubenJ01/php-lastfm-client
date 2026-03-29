@@ -37,6 +37,12 @@ See the [authentication guide](auth/authentication.md) for the full flow.
 | Method                                       | Description                          |
 |----------------------------------------------|--------------------------------------|
 | [`scrobble`](track/scrobble.md)              | Scrobble a track to a user's profile |
+| [`getCorrection`](track/getCorrection.md)    | Get correction for a track           |
+| [`getInfo`](track/getInfo.md)                | Get track metadata                   |
+| [`getSimilar`](track/getSimilar.md)          | Get similar tracks                   |
+| [`getTags`](track/getTags.md)                | Get user-applied track tags          |
+| [`getTopTags`](track/getTopTags.md)          | Get top tags for a track             |
+| [`search`](track/search.md)                  | Search for tracks                    |
 
 ## User
 
